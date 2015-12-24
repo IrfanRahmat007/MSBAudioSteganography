@@ -5,6 +5,8 @@
  */
 package com.msbaudiosteganography.gui;
 import com.msbaudiosteganography.wavfile.WAVReader;
+import com.msbaudiosteganography.wavfile.WavFile;
+import com.msbaudiosteganography.wavfile.WavFileException;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -25,16 +27,12 @@ public class MainGUI extends javax.swing.JFrame {
         initComponents();
         WAVReader reader = new WAVReader();
         try {
-            AudioFileFormat testFormat = reader.getAudioFileFormat(new File("E:\\test.wav"));
-            AudioInputStream test = reader.getAudioInputStream(new File("E:\\test.wav"));
-            byte[] buffer=new byte[192];
-            test.read(buffer);
-            for (int i = 0; i < 192; i++) {
-                System.out.println(buffer[i]);
-            };
-        } catch (UnsupportedAudioFileException ex) {
-            Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
+            WavFile wavFile = WavFile.openWavFile(new File("E:\\test4.wav"));
+            System.out.println(wavFile.getValidBits());
+            System.out.println(wavFile.getSampleRate());
         } catch (IOException ex) {
+            Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (WavFileException ex) {
             Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
         
