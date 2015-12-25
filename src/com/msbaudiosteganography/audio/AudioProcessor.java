@@ -18,13 +18,14 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 public class AudioProcessor {
     
     WavFile wavFile;
+    WavFile outFile;
     File file;
     int channel;
     long totalFrame;
     long remainingFrame;
     long sampleRate;
     int validBits;
-    public AudioProcessor(File audioFile) throws IOException {
+    public AudioProcessor(File audioFile, File outputFile) throws IOException {
         if (audioFile!=null)
         {
             try {
@@ -35,6 +36,7 @@ public class AudioProcessor {
                 remainingFrame=wavFile.getFramesRemaining();
                 sampleRate=wavFile.getSampleRate();
                 validBits=wavFile.getValidBits();
+                outFile=WavFile.newWavFile(outputFile, channel, totalFrame, validBits, sampleRate);
             } catch (WavFileException ex) {
                 Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
             }

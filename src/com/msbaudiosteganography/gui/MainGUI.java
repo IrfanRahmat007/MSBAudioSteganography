@@ -27,9 +27,16 @@ public class MainGUI extends javax.swing.JFrame {
         initComponents();
         WAVReader reader = new WAVReader();
         try {
-            WavFile wavFile = WavFile.openWavFile(new File("E:\\test4.wav"));
+            WavFile wavFile = WavFile.openWavFile(new File("E:\\test2.wav"));
             System.out.println(wavFile.getValidBits());
             System.out.println(wavFile.getSampleRate());
+            long tests=-1;
+            System.out.println(tests);
+            System.out.println(Long.toBinaryString(tests));
+            tests^= 1L << 62;
+            
+            System.out.println(tests);
+            System.out.println(Long.toBinaryString(tests));
         } catch (IOException ex) {
             Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
         } catch (WavFileException ex) {
