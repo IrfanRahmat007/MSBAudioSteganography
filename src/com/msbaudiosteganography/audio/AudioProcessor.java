@@ -16,7 +16,8 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  * @author Andrias
  */
 public class AudioProcessor {
-    
+    int maxBuff;
+    int distance;
     WavFile wavFile;
     WavFile outFile;
     File file;
@@ -26,6 +27,8 @@ public class AudioProcessor {
     long sampleRate;
     int validBits;
     public AudioProcessor(File audioFile, File outputFile) throws IOException {
+        maxBuff = 64;
+        distance = 8;
         if (audioFile!=null)
         {
             try {
@@ -43,38 +46,77 @@ public class AudioProcessor {
         }
 
     }
-    public int getDistance(int now)
+    
+    
+    public int getDistance()
     {
-        return 4;
+        return distance;
     }
     public void WriteMsgInt16(byte[] msg) //untuk wav dengan bit depth 16 bit
     {
-        int[] buffer = new int[32];
+        int[] buffer = new int[maxBuff];
         int msgLength = msg.length;
         int buffCounter;
         int msgCounter;
         buffCounter=msgCounter=0;
         try {  
-            wavFile.readFrames(buffer, msgLength);
+            wavFile.readFrames(buffer, maxBuff);
+            while (msgCounter != msgLength) {
+                while (buffCounter < maxBuff) {
+                    if (msg[msgCounter] == 0) {
+                        if ((buffer[buffCounter] & (1 << 14)) != 0) {
+                            // The bit was set
+                            buffer[buffCounter] ^= 1 << 14; //Invert Bit
+                        }
+                    } else {
+                        if ((buffer[buffCounter] & (1 << 14)) == 0) { //Jika bit
+                            // The bit was not set
+                            buffer[buffCounter] ^= 1 << 14; //Invert Bit
+                        }
+                    }
+                    buffCounter += getDistance();
+                    msgCounter++;
+                }
+                outFile.writeFrames(buffer, maxBuff);
+                maxBuff=wavFile.readFrames(buffer, maxBuff);
+                buffCounter = 0;
+            }
         } catch (IOException ex) {
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (WavFileException ex) {
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         }
-        while(msgCounter!=msgLength)
-        {
-            buffer[buffCounter] |= Short.MIN_VALUE;
-        }
+        
     }
     public void WriteMsgInt8(byte[] msg) //untuk wav dengan bit depth 8 bit
     {
-        int[] buffer = new int[32];
+        int[] buffer = new int[maxBuff];
         int msgLength = msg.length;
         int buffCounter;
         int msgCounter;
         buffCounter=msgCounter=0;
         try {  
-            wavFile.readFrames(buffer, msgLength);
+            wavFile.readFrames(buffer, maxBuff);
+            while (msgCounter != msgLength) {
+                while (buffCounter < maxBuff) {
+                    if (msg[msgCounter] == 0) {
+                        if ((buffer[buffCounter] & (1 << 7)) != 0) {
+                            // The bit was set
+                            buffer[buffCounter] ^= 1 << 7; //Invert Bit
+                        }
+                    } else {
+                        if ((buffer[buffCounter] & (1 << 7)) == 0) { //Jika bit
+                            // The bit was not set
+                            buffer[buffCounter] ^= 1 << 7; //Invert Bit
+                        }
+                    }
+                    buffCounter += getDistance();
+                    msgCounter++;
+                }
+                outFile.writeFrames(buffer, maxBuff);
+                maxBuff = wavFile.readFrames(buffer, maxBuff);
+                buffCounter = 0;
+            }
         } catch (IOException ex) {
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (WavFileException ex) {
@@ -87,13 +129,33 @@ public class AudioProcessor {
     }
     public void WriteMsgInt32(byte[] msg) //untuk wav dengan bit depth 32 bit
     {
-        int[] buffer = new int[32];
+        int[] buffer = new int[maxBuff];
         int msgLength = msg.length;
         int buffCounter;
         int msgCounter;
         buffCounter=msgCounter=0;
         try {  
-            wavFile.readFrames(buffer, msgLength);
+            wavFile.readFrames(buffer, maxBuff);
+            while (msgCounter != msgLength) {
+                while (buffCounter < maxBuff) {
+                    if (msg[msgCounter] == 0) {
+                        if ((buffer[buffCounter] & (1 << 30)) != 0) {
+                            // The bit was set
+                            buffer[buffCounter] ^= 1 << 30; //Invert Bit
+                        }
+                    } else {
+                        if ((buffer[buffCounter] & (1 << 30)) == 0) { //Jika bit
+                            // The bit was not set
+                            buffer[buffCounter] ^= 1 << 30; //Invert Bit
+                        }
+                    }
+                    buffCounter += getDistance();
+                    msgCounter++;
+                }
+                outFile.writeFrames(buffer, maxBuff);
+                maxBuff = wavFile.readFrames(buffer, maxBuff);
+                buffCounter = 0;
+            }
         } catch (IOException ex) {
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (WavFileException ex) {
@@ -106,13 +168,33 @@ public class AudioProcessor {
     }
     public void WriteMsgLong(byte[] msg) //untuk wav dengan bit depth 64 bit
     {
-        long[] buffer = new long[32];
+        long[] buffer = new long[maxBuff];
         int msgLength = msg.length;
         int buffCounter;
         int msgCounter;
         buffCounter=msgCounter=0;
         try {  
-            wavFile.readFrames(buffer, msgLength);
+            wavFile.readFrames(buffer, maxBuff);
+            while (msgCounter != msgLength) {
+                while (buffCounter < maxBuff) {
+                    if (msg[msgCounter] == 0) {
+                        if ((buffer[buffCounter] & (1 << 62)) != 0) {
+                            // The bit was set
+                            buffer[buffCounter] ^= 1 << 62; //Invert Bit
+                        }
+                    } else {
+                        if ((buffer[buffCounter] & (1 << 62)) == 0) { //Jika bit
+                            // The bit was not set
+                            buffer[buffCounter] ^= 1 << 62; //Invert Bit
+                        }
+                    }
+                    buffCounter += getDistance();
+                    msgCounter++;
+                }
+                outFile.writeFrames(buffer, maxBuff);
+                maxBuff = wavFile.readFrames(buffer, maxBuff);
+                buffCounter = 0;
+            }
         } catch (IOException ex) {
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (WavFileException ex) {
@@ -143,13 +225,4 @@ public class AudioProcessor {
             WriteMsgLong(msg);
         }
     }
-    public void WriteAudio(int[] data, File Output)
-    {
-        
-    }
-    public void WriteAudio(long[] data, File Output)
-    {
-        
-    }
-
 }

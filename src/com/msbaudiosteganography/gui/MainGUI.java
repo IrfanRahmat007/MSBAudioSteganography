@@ -30,10 +30,10 @@ public class MainGUI extends javax.swing.JFrame {
             WavFile wavFile = WavFile.openWavFile(new File("E:\\test2.wav"));
             System.out.println(wavFile.getValidBits());
             System.out.println(wavFile.getSampleRate());
-            long tests=-1;
+            long tests=1;
             System.out.println(tests);
             System.out.println(Long.toBinaryString(tests));
-            tests^= 1L << 62;
+            tests ^= 1L << 62;
             
             System.out.println(tests);
             System.out.println(Long.toBinaryString(tests));
