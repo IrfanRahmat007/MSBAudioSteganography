@@ -14,6 +14,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  */
 
 public class AudioProcessor {
+    private String passKey="y0Ox5a";
     int maxBuff;
     int distance;
     WavFile wavFile;
@@ -26,13 +27,13 @@ public class AudioProcessor {
     int validBits;
     
     public AudioProcessor(File audioFile, File outputFile) throws IOException {
-        maxBuff = 64;
-        distance = 8;
-        
+        maxBuff = 2048;
+        distance = maxBuff/8;
         if (audioFile != null) {
             try {
                 file = audioFile;
                 wavFile = WavFile.openWavFile(audioFile);
+                wavFile.display();
                 channel = wavFile.getNumChannels();
                 totalFrame = wavFile.getNumFrames();
                 remainingFrame = wavFile.getFramesRemaining();
@@ -58,11 +59,13 @@ public class AudioProcessor {
         int buffCounter;
         int msgCounter;
         buffCounter = msgCounter = 0;
-        
+        System.out.println("masuk");
         try {  
-            wavFile.readFrames(buffer, maxBuff);
-            while (msgCounter != msgLength) {
+            maxBuff=wavFile.readFrames(buffer, maxBuff/channel)*channel;
+            while (msgCounter < msgLength) {
                 while (buffCounter < maxBuff) {
+                    System.out.println("maxBuff : "+maxBuff);
+                    System.out.println("counter now : "+buffCounter);
                     if (msg[msgCounter] == 0) {
                         if ((buffer[buffCounter] & (1 << 14)) != 0) {
                             // The bit was set
@@ -74,15 +77,18 @@ public class AudioProcessor {
                             buffer[buffCounter] ^= 1 << 14; // Invert Bit
                         }
                     }
-                    
                     buffCounter += getDistance();
                     msgCounter++;
                 }
-                
-                outFile.writeFrames(buffer, maxBuff);
-                maxBuff = wavFile.readFrames(buffer, maxBuff);
+                outFile.writeFrames(buffer, maxBuff/channel);
+                maxBuff = wavFile.readFrames(buffer, maxBuff/channel)*channel;
                 buffCounter = 0;
             }
+            while (maxBuff != 0) {
+                outFile.writeFrames(buffer, maxBuff/channel);
+                maxBuff = wavFile.readFrames(buffer, maxBuff/channel)*channel;
+            }
+            outFile.close();
         } catch (IOException ex) {
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (WavFileException ex) {
@@ -99,7 +105,7 @@ public class AudioProcessor {
         buffCounter = msgCounter = 0;
         
         try {  
-            wavFile.readFrames(buffer, maxBuff);
+            wavFile.readFrames(buffer, maxBuff/channel);
             while (msgCounter != msgLength) {
                 while (buffCounter < maxBuff) {
                     if (msg[msgCounter] == 0) {
@@ -118,19 +124,20 @@ public class AudioProcessor {
                     msgCounter++;
                 }
                 
-                outFile.writeFrames(buffer, maxBuff);
-                maxBuff = wavFile.readFrames(buffer, maxBuff);
+                outFile.writeFrames(buffer, maxBuff/channel);
+                maxBuff = wavFile.readFrames(buffer, maxBuff/channel)*channel;
                 buffCounter = 0;
             }
+            while (maxBuff != 0) {
+                outFile.writeFrames(buffer, maxBuff/channel);
+                maxBuff = wavFile.readFrames(buffer, maxBuff/channel)*channel;
+            }
+            outFile.close();
         } catch (IOException ex) {
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (WavFileException ex) {
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        while(msgCounter != msgLength) {
-            buffer[buffCounter] |= Byte.MIN_VALUE;
-        }
+        }        
     }
     
     // For wav file with 32-bit depth
@@ -142,7 +149,7 @@ public class AudioProcessor {
         buffCounter = msgCounter = 0;
         
         try {  
-            wavFile.readFrames(buffer, maxBuff);
+            wavFile.readFrames(buffer, maxBuff/channel);
             while (msgCounter != msgLength) {
                 while (buffCounter < maxBuff) {
                     if (msg[msgCounter] == 0) {
@@ -161,19 +168,21 @@ public class AudioProcessor {
                     msgCounter++;
                 }
                 
-                outFile.writeFrames(buffer, maxBuff);
-                maxBuff = wavFile.readFrames(buffer, maxBuff);
+                outFile.writeFrames(buffer, maxBuff/channel);
+                maxBuff = wavFile.readFrames(buffer, maxBuff/channel)*channel;
                 buffCounter = 0;
             }
+            while (maxBuff != 0) {
+                outFile.writeFrames(buffer, maxBuff/channel);
+                maxBuff = wavFile.readFrames(buffer, maxBuff/channel)*channel;
+            }
+            outFile.close();
         } catch (IOException ex) {
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (WavFileException ex) {
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        while(msgCounter != msgLength) {
-            buffer[buffCounter] |= Integer.MIN_VALUE;
-        }
     }
     
     // For wav file with 64-bit depth
@@ -184,7 +193,7 @@ public class AudioProcessor {
         int msgCounter;
         buffCounter = msgCounter = 0;
         try {  
-            wavFile.readFrames(buffer, maxBuff);
+            wavFile.readFrames(buffer, maxBuff/channel);
             while (msgCounter != msgLength) {
                 while (buffCounter < maxBuff) {
                     if (msg[msgCounter] == 0) {
@@ -203,19 +212,21 @@ public class AudioProcessor {
                     msgCounter++;
                 }
                 
-                outFile.writeFrames(buffer, maxBuff);
-                maxBuff = wavFile.readFrames(buffer, maxBuff);
+                outFile.writeFrames(buffer, maxBuff/channel);
+                maxBuff = wavFile.readFrames(buffer, maxBuff/channel)*channel;
                 buffCounter = 0;
             }
+            while (maxBuff != 0) {
+                outFile.writeFrames(buffer, maxBuff/channel);
+                maxBuff = wavFile.readFrames(buffer, maxBuff/channel)*channel;
+            }
+            outFile.close();
         } catch (IOException ex) {
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (WavFileException ex) {
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        while(msgCounter != msgLength) {
-            buffer[buffCounter] |= Long.MIN_VALUE;
-        }
     }
     
     public void WriteMsg(byte[] msg) {
