@@ -13,10 +13,10 @@ public class TextProcessor {
         for (int i = 0; i < message.length(); i++) {
             String bit = Integer.toBinaryString(message.charAt(i));
             
-            if (bit.length() < 8) {
-                bit = "00000000".substring(0, 8 - bit.length()).concat(bit);
+            if (bit.length() < 7) {
+                bit = "0000000".substring(0, 7 - bit.length()).concat(bit);
             } else {
-                bit = bit.substring(bit.length() - 8);
+                bit = bit.substring(bit.length() - 7);
             }
             
             buffer = buffer.concat(bit);
@@ -40,6 +40,9 @@ public class TextProcessor {
     }
     
     public byte[] convertBinaryStringToBytes(String message) {
+        return binaryStringToBytes(stringToBinaryString(message));
+    }
+    public byte[] convertBinaryStringToBytesWithPassKey(String message) {
         return binaryStringToBytes(stringToBinaryString(passKey+message+passKey));
     }
     
@@ -81,7 +84,10 @@ public class TextProcessor {
         
         return  text;
     }
-    
+    public String convertByteToText(byte[] byteMessage)
+    {
+        return binaryStringToText(bytesToBinaryString(byteMessage));
+    }
     public String removePassKey(String message) {
         return message.substring(6, message.length() - 6);
     }

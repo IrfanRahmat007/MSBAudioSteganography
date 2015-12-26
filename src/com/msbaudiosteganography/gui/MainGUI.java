@@ -27,12 +27,22 @@ public class MainGUI extends javax.swing.JFrame {
         WAVReader reader = new WAVReader();
         
         try {
-            WavFile wavFile = WavFile.openWavFile(new File("E:\\test.wav"));
-            AudioProcessor ap = new AudioProcessor(new File("E:\\test.wav"), new File("E:\\testhasil.wav"));
+            AudioProcessor ap = new AudioProcessor(new File("E:\\pcm1644s.wav"), new File("E:\\testhasil.wav"));
             String Test = "Rahmat Irfan";
             TextProcessor tp = new TextProcessor();
-            byte[] hasil = tp.convertBinaryStringToBytes(Test);
+            byte[] hasil = tp.convertBinaryStringToBytesWithPassKey(Test);
             ap.WriteMsg(hasil);
+            AudioProcessor ap2 = new AudioProcessor(new File("E:\\testhasil.wav"), null);
+            byte[] hasil2 = ap2.ReadMsg();
+            if (hasil2==null)
+            {
+                System.out.println("Gagal");
+            }
+            else
+            {
+                System.out.println("Sukses");
+                System.out.println(tp.removePassKey(tp.convertByteToText(hasil2)));
+            }
             
         } catch (IOException ex) {
             Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
