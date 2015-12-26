@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.msbaudiosteganography.wavfile;
 /* WAVReader.java -- Read WAV files.
    Copyright (C) 2006 Free Software Foundation, Inc.

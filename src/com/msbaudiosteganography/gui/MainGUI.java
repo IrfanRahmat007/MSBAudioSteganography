@@ -1,9 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.msbaudiosteganography.gui;
+
 import com.msbaudiosteganography.wavfile.WAVReader;
 import com.msbaudiosteganography.wavfile.WavFile;
 import com.msbaudiosteganography.wavfile.WavFileException;
@@ -16,8 +12,9 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
  *
- * @author ASUS-PC
+ * @author Afina, Meisyal, Irfan
  */
+
 public class MainGUI extends javax.swing.JFrame {
 
     /**
@@ -26,24 +23,24 @@ public class MainGUI extends javax.swing.JFrame {
     public MainGUI() {
         initComponents();
         WAVReader reader = new WAVReader();
+        
         try {
             WavFile wavFile = WavFile.openWavFile(new File("E:\\test2.wav"));
             System.out.println(wavFile.getValidBits());
             System.out.println(wavFile.getSampleRate());
-            long tests=1;
-            System.out.println(tests);
-            System.out.println(Long.toBinaryString(tests));
-            tests ^= 1L << 62;
             
-            System.out.println(tests);
-            System.out.println(Long.toBinaryString(tests));
+            long test = 1;
+            System.out.println(test);
+            System.out.println(Long.toBinaryString(test));
+            test ^= 1L << 62;
+            
+            System.out.println(test);
+            System.out.println(Long.toBinaryString(test));
         } catch (IOException ex) {
             Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
         } catch (WavFileException ex) {
             Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
     }
 
     /**
