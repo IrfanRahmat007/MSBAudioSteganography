@@ -41,4 +41,47 @@ public class TextProcessor {
     public byte[] convertBinaryStringToBytes(String message) {
         return binaryStringToBytes(stringToBinaryString(message));
     }
+    
+    public String bytesToBinaryString(byte[] byteMessage) {
+        String buffer = new String();
+        String bit;
+        
+        for (int i = 0; i < byteMessage.length; i++) {
+            if (byteMessage[i] == 0) {
+                bit = "0";
+            } else {
+                bit = "1";
+            }
+            
+            buffer = buffer.concat(bit);
+        }
+        
+        return buffer;
+    }
+    
+    public String binaryStringToText(String binaryString) {
+        String text = new String();
+        String sevenBits = new String();
+        char symbol;
+        
+        for (int i = 0; i < binaryString.length(); i++) {
+            if (binaryString.charAt(i) == '0') {
+                sevenBits = sevenBits.concat("0");
+            } else {
+                sevenBits = sevenBits.concat("1");
+            }
+            
+            if (i % 7 == 6) {
+                symbol = (char) Integer.parseInt(sevenBits, 2);
+                text = text.concat(String.valueOf(symbol));
+                sevenBits = "";
+            } 
+        }
+        
+        return  text;
+    }
+    
+    public String removePassKey(String message) {
+        return message.substring(6, message.length() - 6);
+    }
 }
