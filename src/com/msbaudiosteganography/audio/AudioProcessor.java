@@ -57,7 +57,30 @@ public class AudioProcessor {
             }
         }
     }
-    
+    public AudioProcessor(int buffSize, int buffDivider,File audioFile, File outputFile) throws IOException, WavFileException {
+        maxBuff = buffSize;
+        distance = maxBuff/buffDivider;
+        if (audioFile != null) {
+            try {
+                file = audioFile;
+                wavFile = WavFile.openWavFile(audioFile);
+                wavFile.display();
+                channel = wavFile.getNumChannels();
+                totalFrame = wavFile.getNumFrames();
+                remainingFrame = wavFile.getFramesRemaining();
+                sampleRate = wavFile.getSampleRate();
+                validBits = wavFile.getValidBits();
+                if(outputFile!=null)
+                {
+                    outFile = WavFile.newWavFile(outputFile, channel, totalFrame,
+                            validBits, sampleRate);
+                }
+            } catch (WavFileException ex) {
+                
+                throw ex;
+            }
+        }
+    } 
     
     public int getDistance() {
         return distance;
