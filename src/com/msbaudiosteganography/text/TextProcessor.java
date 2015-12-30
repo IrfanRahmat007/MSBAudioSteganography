@@ -6,7 +6,8 @@ package com.msbaudiosteganography.text;
  */
 
 public class TextProcessor {
-    private String passKey="y0Ox5a";
+    private String passKey = "y0Ox5a";
+    
     public String stringToBinaryString(String message) {
         String buffer = new String();
         
@@ -42,8 +43,10 @@ public class TextProcessor {
     public byte[] convertBinaryStringToBytes(String message) {
         return binaryStringToBytes(stringToBinaryString(message));
     }
+    
     public byte[] convertBinaryStringToBytesWithPassKey(String message) {
-        return binaryStringToBytes(stringToBinaryString(passKey+message+passKey));
+        return binaryStringToBytes(stringToBinaryString(passKey + message + 
+            passKey));
     }
     
     public String bytesToBinaryString(byte[] byteMessage) {
@@ -84,10 +87,11 @@ public class TextProcessor {
         
         return  text;
     }
-    public String convertByteToText(byte[] byteMessage)
-    {
+    
+    public String convertByteToText(byte[] byteMessage) {
         return binaryStringToText(bytesToBinaryString(byteMessage));
     }
+    
     public String removePassKey(String message) {
         return message.substring(6, message.length() - 6);
     }

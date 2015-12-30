@@ -20,39 +20,40 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 
 public class MainGUI extends javax.swing.JFrame {
-
     /**
      * Creates new form MainGUI
      */
     File coverFile;
     File outFile;
+    
     public MainGUI() {
         initComponents();
         WAVReader reader = new WAVReader();
         setLocationRelativeTo(null);
-        try {
-            AudioProcessor ap = new AudioProcessor(new File("E:\\test7.wav"), new File("E:\\testhasil.wav"));
-            String Test = "Rahmat Irfan";
-            TextProcessor tp = new TextProcessor();
-            byte[] hasil = tp.convertBinaryStringToBytesWithPassKey(Test);
-            ap.WriteMsg(hasil);
-            AudioProcessor ap2 = new AudioProcessor(new File("E:\\testhasil.wav"), null);
-            byte[] hasil2 = ap2.ReadMsg();
-            if (hasil2==null)
-            {
-                System.out.println("Gagal");
-            }
-            else
-            {
-                System.out.println("Sukses");
-                System.out.println(tp.removePassKey(tp.convertByteToText(hasil2)));
-            }
-            
-        } catch (IOException ex) {
-            Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (WavFileException ex) {
-            Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        setTitle("MSB Audio Steganography");
+//        try {
+//            AudioProcessor ap = new AudioProcessor(new File("E:\\test7.wav"), new File("E:\\testhasil.wav"));
+//            String Test = "Rahmat Irfan";
+//            TextProcessor tp = new TextProcessor();
+//            byte[] hasil = tp.convertBinaryStringToBytesWithPassKey(Test);
+//            ap.WriteMsg(hasil);
+//            AudioProcessor ap2 = new AudioProcessor(new File("E:\\testhasil.wav"), null);
+//            byte[] hasil2 = ap2.ReadMsg();
+//            if (hasil2==null)
+//            {
+//                System.out.println("Gagal");
+//            }
+//            else
+//            {
+//                System.out.println("Sukses");
+//                System.out.println(tp.removePassKey(tp.convertByteToText(hasil2)));
+//            }
+//            
+//        } catch (IOException ex) {
+//            Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (WavFileException ex) {
+//            Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
+//        }
     }
 
     /**
@@ -98,11 +99,26 @@ public class MainGUI extends javax.swing.JFrame {
         TxtBuffSize1 = new javax.swing.JTextField();
         TxtDivider1 = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
+        jLabel10 = new javax.swing.JLabel();
+        CmdBrowse3 = new javax.swing.JButton();
+        jTextField1 = new javax.swing.JTextField();
+        jPanel8 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        jPanel9 = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        TxtInfo1 = new javax.swing.JTextArea();
+        PgbProgress1 = new javax.swing.JProgressBar();
+        CmdExtract = new javax.swing.JButton();
+        CmdClose2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
 
-        jLabel2.setText("Instruction : Write your message below. And choose a cover using 'Browse...' button.");
+        jLabel2.setText("Instruction: Write your message below. And choose a cover using 'Browse...' button.");
 
         jLabel3.setText("You can choose a bigger buffer size and how many times buffer will be divided to embed message");
 
@@ -173,14 +189,14 @@ public class MainGUI extends javax.swing.JFrame {
         TxtMessage.setToolTipText("");
         jScrollPane1.setViewportView(TxtMessage);
 
-        jLabel1.setText("Message Content : ");
+        jLabel1.setText("Message Content: ");
 
         TxtCoverPath.setEditable(false);
         TxtCoverPath.setName("TxtCoverPath"); // NOI18N
 
-        jLabel4.setText("Cover Path :");
+        jLabel4.setText("Cover Path:");
 
-        jLabel9.setText("Result Path :");
+        jLabel9.setText("Result Path:");
 
         TxtResultPath.setEditable(false);
         TxtResultPath.addActionListener(new java.awt.event.ActionListener() {
@@ -345,7 +361,7 @@ public class MainGUI extends javax.swing.JFrame {
                     .addGroup(jPanel6Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(CboCustom1)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(0, 166, Short.MAX_VALUE))
                     .addGroup(jPanel6Layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -372,21 +388,163 @@ public class MainGUI extends javax.swing.JFrame {
                 .addContainerGap(17, Short.MAX_VALUE))
         );
 
+        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Main Process"));
+
+        jLabel10.setText("Cover Path:");
+
+        CmdBrowse3.setText("Browse...");
+        CmdBrowse3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CmdBrowse3ActionPerformed(evt);
+            }
+        });
+
+        jTextField1.setEditable(false);
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel10)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jTextField1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(CmdBrowse3)
+                .addContainerGap())
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel10)
+                    .addComponent(CmdBrowse3)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Message Content"));
+
+        jTextArea1.setColumns(20);
+        jTextArea1.setRows(5);
+        jScrollPane3.setViewportView(jTextArea1);
+
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3)
+                .addContainerGap())
+        );
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jLabel12.setText("Instruction: Write your message below. And choose a cover using 'Browse...' button.");
+
+        jLabel13.setText("You can choose a bigger buffer size and how many times buffer will be divided to embed message");
+
+        jPanel9.setBorder(javax.swing.BorderFactory.createTitledBorder("Process Information"));
+
+        TxtInfo1.setEditable(false);
+        TxtInfo1.setColumns(20);
+        TxtInfo1.setRows(5);
+        jScrollPane4.setViewportView(TxtInfo1);
+
+        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
+        jPanel9.setLayout(jPanel9Layout);
+        jPanel9Layout.setHorizontalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(PgbProgress1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addContainerGap())
+        );
+        jPanel9Layout.setVerticalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
+                .addComponent(PgbProgress1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        CmdExtract.setText("Extract");
+        CmdExtract.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CmdExtractActionPerformed(evt);
+            }
+        });
+
+        CmdClose2.setText("Close");
+        CmdClose2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CmdClose2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel9, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel12)
+                            .addComponent(jLabel13))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(CmdExtract)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(CmdClose2)))
                 .addContainerGap())
         );
+
+        jPanel4Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {CmdClose2, CmdExtract});
+
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(155, 155, 155)
+                .addGap(12, 12, 12)
+                .addComponent(jLabel12)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel13)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(4, 4, 4)
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(327, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(CmdExtract)
+                    .addComponent(CmdClose2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(61, 61, 61))
         );
 
         jTabbedPane1.addTab("Extracting", jPanel4);
@@ -406,17 +564,16 @@ public class MainGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void CboCustomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CboCustomActionPerformed
-        // TODO add your handling code here:
         TxtBuffSize.setEnabled(!TxtBuffSize.isEnabled());
         TxtDivider.setEnabled(!TxtDivider.isEnabled());
     }//GEN-LAST:event_CboCustomActionPerformed
 
     private void CmdBrowseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CmdBrowseActionPerformed
-        // TODO add your handling code here:
         JFileChooser OPF = new JFileChooser();
         OPF.setCurrentDirectory(new File(System.getProperty("user.home")));
         OPF.setFileFilter(new FileNameExtensionFilter("Waveform Audio File","wav"));
         int result = OPF.showOpenDialog(this);
+        
         if (result == JFileChooser.APPROVE_OPTION) {
             TxtCoverPath.setText(OPF.getSelectedFile().getPath());
              coverFile= OPF.getSelectedFile();
@@ -426,26 +583,23 @@ public class MainGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_CmdBrowseActionPerformed
 
     private void CmdCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CmdCloseActionPerformed
-        // TODO add your handling code here:
         System.exit(0);
     }//GEN-LAST:event_CmdCloseActionPerformed
 
     private void CmdBrowse2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CmdBrowse2ActionPerformed
-        // TODO add your handling code here:
         JFileChooser SPF = new JFileChooser();
         SPF.setCurrentDirectory(new File(System.getProperty("user.home")));
         SPF.setFileFilter(new FileNameExtensionFilter("Waveform Audio File","wav"));
         int result = SPF.showSaveDialog(this);
+        
         if (result == JFileChooser.APPROVE_OPTION) {
-            if(SPF.getSelectedFile().getPath().toUpperCase().endsWith(".WAV"))
-            {
+            if (SPF.getSelectedFile().getPath().toUpperCase().endsWith(".WAV")) {
                 TxtResultPath.setText(SPF.getSelectedFile().getPath());
-            }           
-            else
-            {
+            } else {
                 TxtResultPath.setText(SPF.getSelectedFile().getPath()+".wav");
             }
-             outFile= SPF.getSelectedFile();
+            
+            outFile = SPF.getSelectedFile();
              
             // user selects a file
         }
@@ -454,6 +608,22 @@ public class MainGUI extends javax.swing.JFrame {
     private void TxtResultPathActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TxtResultPathActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_TxtResultPathActionPerformed
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void CmdBrowse3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CmdBrowse3ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_CmdBrowse3ActionPerformed
+
+    private void CmdExtractActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CmdExtractActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_CmdExtractActionPerformed
+
+    private void CmdClose2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CmdClose2ActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_CmdClose2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -495,18 +665,26 @@ public class MainGUI extends javax.swing.JFrame {
     private javax.swing.JCheckBox CboCustom1;
     private javax.swing.JButton CmdBrowse;
     private javax.swing.JButton CmdBrowse2;
+    private javax.swing.JButton CmdBrowse3;
     private javax.swing.JButton CmdClose;
+    private javax.swing.JButton CmdClose2;
     private javax.swing.JButton CmdEmbed;
+    private javax.swing.JButton CmdExtract;
     private javax.swing.JProgressBar PgbProgress;
+    private javax.swing.JProgressBar PgbProgress1;
     private javax.swing.JTextField TxtBuffSize;
     private javax.swing.JTextField TxtBuffSize1;
     private javax.swing.JTextField TxtCoverPath;
     private javax.swing.JTextField TxtDivider;
     private javax.swing.JTextField TxtDivider1;
     private javax.swing.JTextArea TxtInfo;
+    private javax.swing.JTextArea TxtInfo1;
     private javax.swing.JTextArea TxtMessage;
     private javax.swing.JTextField TxtResultPath;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -521,9 +699,16 @@ public class MainGUI extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTabbedPane jTabbedPane2;
+    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }
