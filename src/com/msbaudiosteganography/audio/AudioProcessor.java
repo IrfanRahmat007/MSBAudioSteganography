@@ -2,8 +2,10 @@ package com.msbaudiosteganography.audio;
 
 import com.msbaudiosteganography.text.TextProcessor;
 import com.msbaudiosteganography.wavfile.*;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -85,7 +87,42 @@ public class AudioProcessor {
     public int getDistance() {
         return distance;
     }
-    
+    public String getSourceInfo(){
+        String info;
+        PrintStream infoOut;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        
+        infoOut = new PrintStream(baos);
+        wavFile.display(infoOut);
+        info = baos.toString();
+        try {
+            infoOut.close();
+            baos.close();
+        } catch (IOException ex) {
+            Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return info;
+    }
+    public String getDestinationInfo(){
+        if(outFile==null)
+        {
+            return null;
+        }
+        String info;
+        PrintStream infoOut;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        
+        infoOut = new PrintStream(baos);
+        outFile.display(infoOut);
+        info = baos.toString();
+        try {
+            infoOut.close();
+            baos.close();
+        } catch (IOException ex) {
+            Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return info;
+    }
     // For wav file with 16-bit depth
     public void WriteMsgInt16(byte[] msg) {
         int[] buffer = new int[maxBuff];
