@@ -34,11 +34,15 @@ public class AudioProcessor {
     long remainingFrame;
     long sampleRate;
     int validBits;
+    double sqe;
+    String logString;
+    
     
     public AudioProcessor(File audioFile, File outputFile) throws IOException, WavFileException {
         maxBuff = 1024;
         distance = maxBuff / 8;
-        
+        logString = "";
+        sqe = 0;
         if (audioFile != null) {
             try {
                 file = audioFile;
@@ -61,7 +65,7 @@ public class AudioProcessor {
     public AudioProcessor(int buffSize, int buffDivider,File audioFile, File outputFile) throws IOException, WavFileException {
         maxBuff = buffSize;
         distance = maxBuff/buffDivider;
-        
+        logString = "";
         if (audioFile != null) {
             try {
                 file = audioFile;
@@ -80,8 +84,69 @@ public class AudioProcessor {
                 throw ex;
             }
         }
-    } 
+    }
+    public boolean checkSize(byte[] msg)
+    {
+        boolean result=false;
+        int len=msg.length;
+        if(totalFrame/getDistance()>=msg.length)
+        {
+            return true;
+        }
+        
+        return result;
+    }
     
+    private void getSQEInt(int[] bufferOrig, int[] bufferMod)
+    {
+        double err;
+        for(int i = 0;i < bufferOrig.length;i++)
+        {
+            err=bufferMod[i]-bufferOrig[i];
+            err=err*err;
+            sqe=sqe+err;
+        }
+    }
+    private void getSQELong(long[] bufferOrig, long[] bufferMod)
+    {
+        double err;
+        for(int i = 0;i < bufferOrig.length;i++)
+        {
+            err=bufferMod[i]-bufferOrig[i];
+            err=err * err;
+            sqe=sqe + err;
+        }
+    }
+    
+    private double getMSE()
+    {
+        double result;
+        result = (double) sqe / (double) totalFrame;
+        return result;
+    }
+    
+    public double getPSNR()
+    {
+        double MSE = getMSE();
+        double result = 0;
+        if(validBits==8)
+        {
+            result=(double) 20 * java.lang.Math.log10(Byte.MAX_VALUE) - (double) 10 * java.lang.Math.log10(MSE);
+        }
+        else if (validBits==16)
+        {
+            result=(double) 20 * java.lang.Math.log10(Short.MAX_VALUE) - (double) 10 * java.lang.Math.log10(MSE);
+        }
+        else if (validBits==32)
+        {
+            result=(double) 20 * java.lang.Math.log10(Integer.MAX_VALUE) - (double) 10*java.lang.Math.log10(MSE);
+        }
+        else if (validBits==64)
+        {
+            result=(double) 20 * java.lang.Math.log10(Long.MAX_VALUE) - (double) 10 * java.lang.Math.log10(MSE);
+        }
+        return result;
+    }
     public int getDistance() {
         return distance;
     }
@@ -131,34 +196,42 @@ public class AudioProcessor {
     // For wav file with 16-bit depth
     public void WriteMsgInt16(byte[] msg) {
         int[] buffer = new int[maxBuff];
+        int[] bufferOrig = new int[maxBuff];
         int msgLength = msg.length;
         int buffCounter;
         int msgCounter;
         buffCounter = msgCounter = 0;
         // System.out.println("masuk");
+        System.out.println(msg.length);
+
         try {  
             maxBuff=wavFile.readFrames(buffer, maxBuff/channel)*channel;
-            
+            bufferOrig=buffer.clone();
             while (msgCounter < msgLength) {
                 while (buffCounter < maxBuff) {
-                    if (msg[msgCounter] == 0) {
-                        if ((buffer[buffCounter] & (1 << MSBInt16)) != 0) {     //If bit was set. LSB bisa pakai 0
-                            // The bit was set
-                            buffer[buffCounter] ^= 1 << MSBInt16; // Invert Bit
-                        }
-                    } else {
-                        if ((buffer[buffCounter] & (1 << MSBInt16)) == 0) { // If bit was not set
-                            // The bit was not set
-                            buffer[buffCounter] ^= 1 << MSBInt16; // Invert Bit
-                        }
+                    System.out.println(msgCounter);
+                    if(msgCounter==msgLength)
+                    {
+                        break;
                     }
-                    
+                    if (msg[msgCounter] == 0) {
+                            if ((buffer[buffCounter] & (1 << MSBInt16)) != 0) {     //If bit was set. LSB bisa pakai 0
+                                // The bit was set
+                                buffer[buffCounter] ^= 1 << MSBInt16; // Invert Bit
+                            }
+                        } else {
+                            if ((buffer[buffCounter] & (1 << MSBInt16)) == 0) { // If bit was not set
+                                // The bit was not set
+                                buffer[buffCounter] ^= 1 << MSBInt16; // Invert Bit
+                            }
+                        }
                     buffCounter += getDistance();
                     msgCounter++;
                 }
-                
+                getSQEInt(bufferOrig, buffer);
                 outFile.writeFrames(buffer, maxBuff/channel);
                 maxBuff = wavFile.readFrames(buffer, maxBuff/channel)*channel;
+                bufferOrig=buffer.clone();
                 buffCounter = 0;
             }
             
@@ -178,6 +251,7 @@ public class AudioProcessor {
     // For wav file with 8-bit depth
     public void WriteMsgInt8(byte[] msg) {
         int[] buffer = new int[maxBuff];
+        int[] bufferOrig = new int[maxBuff];
         int msgLength = msg.length;
         int buffCounter;
         int msgCounter;
@@ -185,9 +259,13 @@ public class AudioProcessor {
         
         try {
             maxBuff = wavFile.readFrames(buffer, maxBuff / channel) * channel;
-            
+            bufferOrig = buffer.clone();
             while (msgCounter < msgLength) {
                 while (buffCounter < maxBuff) {
+                    if(msgCounter==msgLength)
+                    {
+                        break;
+                    }
                     if (msg[msgCounter] == 0) {
                         if ((buffer[buffCounter] & (1 << MSBInt8)) != 0) {     //If bit was set. LSB bisa pakai 0
                             // The bit was set
@@ -203,9 +281,10 @@ public class AudioProcessor {
                     buffCounter += getDistance();
                     msgCounter++;
                 }
-                
+                getSQEInt(bufferOrig, buffer);
                 outFile.writeFrames(buffer, maxBuff / channel);
                 maxBuff = wavFile.readFrames(buffer, maxBuff / channel) * channel;
+                bufferOrig = buffer.clone();
                 buffCounter = 0;
             }
             
@@ -225,6 +304,7 @@ public class AudioProcessor {
     // For wav file with 32-bit depth
     public void WriteMsgInt32(byte[] msg) {
         int[] buffer = new int[maxBuff];
+        int[] bufferOrig = new int[maxBuff];
         int msgLength = msg.length;
         int buffCounter;
         int msgCounter;
@@ -232,9 +312,13 @@ public class AudioProcessor {
         
         try {
             maxBuff = wavFile.readFrames(buffer, maxBuff / channel) * channel;
-            
+            bufferOrig = buffer.clone();
             while (msgCounter < msgLength) {
                 while (buffCounter < maxBuff) {
+                    if(msgCounter==msgLength)
+                    {
+                        break;
+                    }
                     if (msg[msgCounter] == 0) {
                         if ((buffer[buffCounter] & (1 << MSBInt32)) != 0) {     //If bit was set. LSB bisa pakai 0
                             // The bit was set
@@ -250,9 +334,10 @@ public class AudioProcessor {
                     buffCounter += getDistance();
                     msgCounter++;
                 }
-                
+                getSQEInt(bufferOrig, buffer);
                 outFile.writeFrames(buffer, maxBuff / channel);
                 maxBuff = wavFile.readFrames(buffer, maxBuff / channel) * channel;
+                bufferOrig = buffer.clone();
                 buffCounter = 0;
             }
             
@@ -274,6 +359,7 @@ public class AudioProcessor {
     public void WriteMsgLong(byte[] msg) {
         System.out.println("masuk");
         long[] buffer = new long[maxBuff];
+        long[] bufferOrig = new long[maxBuff];
         int msgLength = msg.length;
         int buffCounter;
         int msgCounter;
@@ -281,9 +367,13 @@ public class AudioProcessor {
         
         try {
             maxBuff = wavFile.readFrames(buffer, maxBuff / channel) * channel;
-            
+            bufferOrig = buffer.clone();
             while (msgCounter < msgLength) {
                 while (buffCounter < maxBuff) {
+                    if(msgCounter==msgLength)
+                    {
+                        break;
+                    }
                     if (msg[msgCounter] == 0) {
                         if ((buffer[buffCounter] & (1 << MSBLong)) != 0) {     //If bit was set. LSB bisa pakai 0
                             // The bit was set
@@ -299,9 +389,10 @@ public class AudioProcessor {
                     buffCounter += getDistance();
                     msgCounter++;
                 }
-                
+                getSQELong(bufferOrig, buffer);
                 outFile.writeFrames(buffer, maxBuff / channel);
                 maxBuff = wavFile.readFrames(buffer, maxBuff / channel) * channel;
+                bufferOrig = buffer.clone();
                 buffCounter = 0;
             }
             
@@ -320,6 +411,7 @@ public class AudioProcessor {
     }
     
     public void WriteMsg(byte[] msg) {
+        Log(getSourceInfo());
         if (validBits == 8) {
             WriteMsgInt8(msg);
         } else if (validBits == 16) {
@@ -329,6 +421,7 @@ public class AudioProcessor {
         } else {
             WriteMsgLong(msg);
         }
+        Log(getDestinationInfo());
     }
     
     public boolean CheckPassCounter(int listCounter, int passCounter, ArrayList<Integer> msgList, byte pass[]) {
@@ -662,6 +755,9 @@ public class AudioProcessor {
         }
         
         return msg;
+    }
+    private void Log(String log) {
+        logString=logString+"\n\n"+log;
     }
     
     public byte[] ReadMsg() {

@@ -15,7 +15,7 @@ public class TextProcessor {
             String bit = Integer.toBinaryString(message.charAt(i));
             
             if (bit.length() < 7) {
-                bit = "0000000".substring(0, 7 - bit.length()).concat(bit);
+               bit = "0000000".substring(0, 7 - bit.length()).concat(bit);
             } else {
                 bit = bit.substring(bit.length() - 7);
             }
@@ -45,7 +45,7 @@ public class TextProcessor {
     }
     
     public byte[] convertBinaryStringToBytesWithPassKey(String message) {
-        return binaryStringToBytes(stringToBinaryString(passKey + message + 
+        return binaryStringToBytes(stringToBinaryString(passKey + message + " " + 
             passKey));
     }
     
@@ -93,6 +93,6 @@ public class TextProcessor {
     }
     
     public String removePassKey(String message) {
-        return message.substring(6, message.length() - 6);
+        return message.substring(6, message.length() - 7);
     }
 }
