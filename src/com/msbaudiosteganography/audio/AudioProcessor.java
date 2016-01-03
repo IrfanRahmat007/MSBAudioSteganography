@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -23,7 +24,7 @@ public class AudioProcessor {
     int maxBuff;
     int distance;
     int MSBInt8=6;
-    int MSBInt16=9; //Choice 16/2 - 14
+    int MSBInt16=7; //Choice 16/2 - 14
     int MSBInt32=30;  //Choice 32/2 - 30
     int MSBLong=62;   //Choice 64/2 - 62
     WavFile wavFile;
@@ -36,10 +37,12 @@ public class AudioProcessor {
     int validBits;
     double sqe;
     String logString;
+    boolean fail;
     
     
     public AudioProcessor(File audioFile, File outputFile) throws IOException, WavFileException {
         maxBuff = 1024;
+        fail=false;
         distance = maxBuff / 8;
         logString = "";
         sqe = 0;
@@ -62,39 +65,58 @@ public class AudioProcessor {
             }
         }
     }
-    public AudioProcessor(int buffSize, int buffDivider,File audioFile, File outputFile) throws IOException, WavFileException {
-        maxBuff = buffSize;
-        distance = maxBuff/buffDivider;
-        logString = "";
-        if (audioFile != null) {
-            try {
-                file = audioFile;
-                wavFile = WavFile.openWavFile(audioFile);
-                wavFile.display();
-                channel = wavFile.getNumChannels();
-                totalFrame = wavFile.getNumFrames();
-                remainingFrame = wavFile.getFramesRemaining();
-                sampleRate = wavFile.getSampleRate();
-                validBits = wavFile.getValidBits();
-                if(outputFile != null) {
-                    outFile = WavFile.newWavFile(outputFile, channel, totalFrame,
-                            validBits, sampleRate);
-                }
-            } catch (WavFileException ex) {
-                throw ex;
-            }
-        }
+//    public AudioProcessor(int buffSize, int buffDivider,File audioFile, File outputFile) throws IOException, WavFileException {
+//        maxBuff = buffSize;
+//        distance = maxBuff/buffDivider;
+//        logString = "";
+//        if (audioFile != null) {
+//            try {
+//                file = audioFile;
+//                wavFile = WavFile.openWavFile(audioFile);
+//                wavFile.display();
+//                channel = wavFile.getNumChannels();
+//                totalFrame = wavFile.getNumFrames();
+//                remainingFrame = wavFile.getFramesRemaining();
+//                sampleRate = wavFile.getSampleRate();
+//                validBits = wavFile.getValidBits();
+//                if(outputFile != null) {
+//                    outFile = WavFile.newWavFile(outputFile, channel, totalFrame,
+//                            validBits, sampleRate);
+//                }
+//            } catch (WavFileException ex) {
+//                throw ex;
+//            }
+//        }
+//    }
+    
+    public boolean getStatus()
+    {
+        return !fail;
     }
     public boolean checkSize(byte[] msg)
     {
         boolean result=false;
-        int len=msg.length;
-        if(totalFrame/getDistance()>=msg.length)
+        int size=(msg.length)*getDistance()/channel;
+        if((totalFrame*channel/getDistance())>=msg.length)
         {
-            return true;
+            result=true;
+            Log("Cover size is sufficient to proceed. \nSize : " + size);
         }
-        
+        else
+        {
+            
+            Log("Cover size is too small!!!\nMinimum frame needed for this message\n including passkey is "+size+"\nTotal frame : "+totalFrame);
+        }
         return result;
+    }
+    
+    public void clearLog()
+    {
+        logString="";
+    }
+    public String getLog()
+    {
+        return logString;
     }
     
     private void getSQEInt(int[] bufferOrig, int[] bufferMod)
@@ -201,15 +223,12 @@ public class AudioProcessor {
         int buffCounter;
         int msgCounter;
         buffCounter = msgCounter = 0;
-        // System.out.println("masuk");
-        System.out.println(msg.length);
 
         try {  
             maxBuff=wavFile.readFrames(buffer, maxBuff/channel)*channel;
             bufferOrig=buffer.clone();
             while (msgCounter < msgLength) {
                 while (buffCounter < maxBuff) {
-                    System.out.println(msgCounter);
                     if(msgCounter==msgLength)
                     {
                         break;
@@ -242,8 +261,10 @@ public class AudioProcessor {
             
             outFile.close();
         } catch (IOException ex) {
+            fail=true;
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (WavFileException ex) {
+            fail = true;
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -295,8 +316,10 @@ public class AudioProcessor {
             
             outFile.close();
         } catch (IOException ex) {
+            fail = true;
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (WavFileException ex) {
+            fail = true;
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         }        
     }
@@ -348,8 +371,10 @@ public class AudioProcessor {
             
             outFile.close();
         } catch (IOException ex) {
+            fail = true;
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (WavFileException ex) {
+            fail = true;
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         }
         
@@ -357,7 +382,6 @@ public class AudioProcessor {
     
     // For wav file with 64-bit depth
     public void WriteMsgLong(byte[] msg) {
-        System.out.println("masuk");
         long[] buffer = new long[maxBuff];
         long[] bufferOrig = new long[maxBuff];
         int msgLength = msg.length;
@@ -403,33 +427,45 @@ public class AudioProcessor {
             
             outFile.close();
         } catch (IOException ex) {
+            fail = true;
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (WavFileException ex) {
+            fail = true;
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         }
         
     }
     
     public void WriteMsg(byte[] msg) {
-        Log(getSourceInfo());
-        if (validBits == 8) {
-            WriteMsgInt8(msg);
-        } else if (validBits == 16) {
-            WriteMsgInt16(msg);
-        } else if (validBits == 32) {
-            WriteMsgInt32(msg);
-        } else {
-            WriteMsgLong(msg);
+        if(!checkSize(msg))
+        {
+            Log("Operation aborted!!!");
+            fail=true;
         }
-        Log(getDestinationInfo());
+        else
+        {
+            Log("Writing message to file...");
+            if (validBits == 8) {
+                WriteMsgInt8(msg);
+            } else if (validBits == 16) {
+                WriteMsgInt16(msg);
+            } else if (validBits == 32) {
+                WriteMsgInt32(msg);
+            } else {
+                WriteMsgLong(msg);
+            }
+            if(!fail)
+            {
+                Log("Write operation success.");
+            }
+            
+        }
     }
     
     public boolean CheckPassCounter(int listCounter, int passCounter, ArrayList<Integer> msgList, byte pass[]) {
         if (msgList.get(listCounter) == pass[passCounter]) {
-            //System.out.println("msgList : "+msgList.get(listCounter)+" passKey : "+pass[passCounter]);
             return true;
         }
-        //System.out.println("msgList : "+msgList.get(listCounter)+" passKey : "+pass[passCounter]);
         return false;
     }
     
@@ -449,15 +485,11 @@ public class AudioProcessor {
             
             while (maxBuff > 0) {
                 if (stopCounter == bPasskey.length) {
-                    System.out.println("Passkey ditemukan. Berhenti!!!");
                     break;
                 }
                 
                 while (buffCounter < maxBuff) {
-                    //System.out.println("maxBuff : "+maxBuff);
-                    //System.out.println("counter now : "+buffCounter);
                     if (stopCounter == bPasskey.length) {
-                        System.out.println("Keluar benar");
                         break;
                     }
                     
@@ -470,22 +502,21 @@ public class AudioProcessor {
                     
                     if (bitCounter < bPasskey.length) {
                         if (CheckPassCounter(bitCounter, passCounter, msgList, bPasskey) == false) {
-                            System.out.println("keluar2");
+                            fail = true;
+                            Log("Passkey not found. Operation aborted.");
                             return null;
                         } else {
                             passCounter++;
-                            //System.out.println("passCounter : " + passCounter);
                         }
                     } else {
                         if (CheckPassCounter(bitCounter, stopCounter, msgList, bPasskey) == true) {
                             stopCounter++;
-                            System.out.println("stopCounter : " + stopCounter);
                         } else {
                             stopCounter = 0;
                         }
                     }
-                    //System.out.println("passCounter : " + passCounter);
                     if (passCounter == bPasskey.length) {
+                        Log("Passkey found. Reading message...");
                         passCounter=0;
                     }
                     
@@ -499,8 +530,10 @@ public class AudioProcessor {
             
             wavFile.close();
         } catch (IOException ex) {
+            fail = true;
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (WavFileException ex) {
+            fail = true;
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         }
         
@@ -530,15 +563,11 @@ public class AudioProcessor {
             
             while (maxBuff > 0) {
                 if (stopCounter == bPasskey.length) {
-                    System.out.println("Passkey ditemukan. Berhenti!!!");
                     break;
                 }
                 
                 while (buffCounter < maxBuff) {
-                    //System.out.println("maxBuff : "+maxBuff);
-                    //System.out.println("counter now : "+buffCounter);
                     if (stopCounter == bPasskey.length) {
-                        System.out.println("Keluar benar");
                         break;
                     }
                     
@@ -551,22 +580,21 @@ public class AudioProcessor {
 
                     if (bitCounter < bPasskey.length) {
                         if (CheckPassCounter(bitCounter, passCounter, msgList, bPasskey) == false) {
-                            System.out.println("keluar2");
+                            fail = true;
+                            Log("Passkey not found. Operation aborted.");
                             return null;
                         } else {
                             passCounter++;
-                            //System.out.println("passCounter : " + passCounter);
                         }
                     } else {
                         if (CheckPassCounter(bitCounter, stopCounter, msgList, bPasskey) == true) {
                             stopCounter++;
-                            System.out.println("stopCounter : " + stopCounter);
                         } else {
                             stopCounter = 0;
                         }
                     }
-                    //System.out.println("passCounter : " + passCounter);
                     if (passCounter == bPasskey.length) {
+                        Log("Passkey found. Reading message...");
                         passCounter = 0;
                     }
 
@@ -580,8 +608,10 @@ public class AudioProcessor {
             
             wavFile.close();
         } catch (IOException ex) {
+            fail = true;
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (WavFileException ex) {
+            fail = true;
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -610,15 +640,11 @@ public class AudioProcessor {
             
             while (maxBuff > 0) {
                 if (stopCounter == bPasskey.length) {
-                    System.out.println("Passkey ditemukan. Berhenti!!!");
                     break;
                 }
                 
                 while (buffCounter < maxBuff) {
-                    //System.out.println("maxBuff : "+maxBuff);
-                    //System.out.println("counter now : "+buffCounter);
                     if (stopCounter == bPasskey.length) {
-                        System.out.println("Keluar benar");
                         break;
                     }
                     
@@ -631,22 +657,21 @@ public class AudioProcessor {
 
                     if (bitCounter < bPasskey.length) {
                         if (CheckPassCounter(bitCounter, passCounter, msgList, bPasskey) == false) {
-                            System.out.println("keluar2");
+                            fail = true;
+                            Log("Passkey not found. Operation aborted.");
                             return null;
                         } else {
                             passCounter++;
-                            //System.out.println("passCounter : " + passCounter);
                         }
                     } else {
                         if (CheckPassCounter(bitCounter, stopCounter, msgList, bPasskey) == true) {
                             stopCounter++;
-                            System.out.println("stopCounter : " + stopCounter);
                         } else {
                             stopCounter = 0;
                         }
                     }
-                    //System.out.println("passCounter : " + passCounter);
                     if (passCounter == bPasskey.length) {
+                        Log("Passkey found. Reading message...");
                         passCounter = 0;
                     }
 
@@ -660,8 +685,10 @@ public class AudioProcessor {
             
             wavFile.close();
         } catch (IOException ex) {
+            fail = true;
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (WavFileException ex) {
+            fail = true;
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -691,15 +718,11 @@ public class AudioProcessor {
             
             while (maxBuff > 0) {
                 if (stopCounter == bPasskey.length) {
-                    System.out.println("Passkey ditemukan. Berhenti!!!");
                     break;
                 }
                 
                 while (buffCounter < maxBuff) {
-                    //System.out.println("maxBuff : "+maxBuff);
-                    //System.out.println("counter now : "+buffCounter);
                     if (stopCounter == bPasskey.length) {
-                        System.out.println("Keluar benar");
                         break;
                     }
                     
@@ -712,23 +735,22 @@ public class AudioProcessor {
                     
                     if (bitCounter < bPasskey.length) {
                         if (CheckPassCounter(bitCounter, passCounter, msgList, bPasskey) == false) {
-                            System.out.println("keluar2");
+                            fail = true;
+                            Log("Passkey not found. Operation aborted.");
                             return null;
                         } else {
                             passCounter++;
-                            //System.out.println("passCounter : " + passCounter);
                         }
                     } else {
                         if (CheckPassCounter(bitCounter, stopCounter, msgList, bPasskey) == true) {
                             stopCounter++;
-                            System.out.println("stopCounter : " + stopCounter);
                         } else {
                             stopCounter = 0;
                         }
                     }
-                    //System.out.println("passCounter : " + passCounter);
                     if(passCounter==bPasskey.length)
                     {
+                        Log("Passkey found. Reading message...");
                         passCounter=0;
                     }
                     
@@ -742,8 +764,10 @@ public class AudioProcessor {
             
             wavFile.close();
         } catch (IOException ex) {
+            fail = true;
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (WavFileException ex) {
+            fail = true;
             Logger.getLogger(AudioProcessor.class.getName()).log(Level.SEVERE, null, ex);
         }
         
@@ -757,20 +781,37 @@ public class AudioProcessor {
         return msg;
     }
     private void Log(String log) {
-        logString=logString+"\n\n"+log;
+        if(logString.endsWith("\n") || logString.endsWith("\r") || logString.endsWith("\r\n"))
+        {
+            logString=logString+log;
+        }
+        else
+        {
+            logString=logString+"\n"+log;
+        }
+        
     }
     
     public byte[] ReadMsg() {
         TextProcessor tp = new TextProcessor();
-        
+        byte[] result;
+        Log("Reading passkey from file...");
         if (validBits == 8) {
-            return ReadMsgInt8(tp);
+            result = ReadMsgInt8(tp);
         } else if (validBits == 16) {
-            return ReadMsgInt16(tp);
+            result = ReadMsgInt16(tp);
         } else if (validBits == 32) {
-            return ReadMsgInt32(tp);
+            result = ReadMsgInt32(tp);
         } else {
-            return ReadMsgLong(tp);
+            result = ReadMsgLong(tp);
         }
+        
+        if(!fail)
+        {
+            Log("Read operation success.");
+        }
+        
+        return result;
+        
     }
 }
