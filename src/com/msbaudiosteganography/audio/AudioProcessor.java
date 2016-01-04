@@ -23,10 +23,10 @@ public class AudioProcessor {
     private String passKey = "y0Ox5a";
     int maxBuff;
     int distance;
-    int MSBInt8=6;
+    int MSBInt8=4;
     int MSBInt16=7; //Choice 16/2 - 14
-    int MSBInt32=30;  //Choice 32/2 - 30
-    int MSBLong=62;   //Choice 64/2 - 62
+    int MSBInt32=23;  //Choice 32/2 - 30
+    int MSBLong=55;   //Choice 64/2 - 62
     WavFile wavFile;
     WavFile outFile;
     File file;

@@ -604,9 +604,11 @@ public class MainGUI extends javax.swing.JFrame {
                     Log("Failed. The file may be damaged \n or no message has been embedded",1);
                 }
             } catch (IOException ex) {
-                Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
+                Log("File is still opened by other program!!!\nPlease close other program first.",0);
+                //Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
             } catch (WavFileException ex) {
-                Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
+                Log("Unsupported file type!!! \nPlease choose a wave file encoded in pcm",0);
+                //Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
             }
             PgbExtract.setValue(PgbExtract.getMaximum());
             
@@ -654,8 +656,10 @@ public class MainGUI extends javax.swing.JFrame {
                     }
                     PgbEmbed.setValue(PgbEmbed.getMaximum());
                 } catch (IOException ex) {
+                    Log("File is still opened by other program!!!\nPlease close other program first.",0);
                     Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (WavFileException ex) {
+                    Log("Unsupported file type!!! \nPlease choose a wave file encoded in pcm",0);
                     Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 
