@@ -585,6 +585,7 @@ public class MainGUI extends javax.swing.JFrame {
         else
         {
             PgbExtract.setValue(PgbExtract.getMinimum());
+            long startTime = System.nanoTime();
             try {
                 
                 AudioProcessor ap = new AudioProcessor(coverFile, null);
@@ -610,6 +611,10 @@ public class MainGUI extends javax.swing.JFrame {
                 Log("Unsupported file type!!! \nPlease choose a wave file encoded in pcm",0);
                 //Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
             }
+            long endTime = System.nanoTime();
+            long duration = endTime - startTime;
+            double durationInSecond = (double) duration / 1000000000.0;
+            Log("Duration : " + durationInSecond + "s", 1);
             PgbExtract.setValue(PgbExtract.getMaximum());
             
         }
@@ -636,6 +641,7 @@ public class MainGUI extends javax.swing.JFrame {
             else
             {
                 PgbEmbed.setValue(PgbEmbed.getMinimum());
+                long startTime = System.nanoTime();
                 try {
                     AudioProcessor ap=new AudioProcessor(coverFile,outFile);
                     TextProcessor tp = new TextProcessor();
@@ -662,7 +668,10 @@ public class MainGUI extends javax.swing.JFrame {
                     Log("Unsupported file type!!! \nPlease choose a wave file encoded in pcm",0);
                     Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
+                long endTime = System.nanoTime();
+                long duration = endTime - startTime;
+                double durationInSecond = (double) duration / 1000000000.0;
+                Log("Duration : "+durationInSecond+"s",0);
             }
         }
     }//GEN-LAST:event_CmdEmbedActionPerformed
